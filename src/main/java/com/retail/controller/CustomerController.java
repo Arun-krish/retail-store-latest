@@ -5,7 +5,6 @@ import com.retail.service.CustomerService;
 import com.retail.util.ResponsePojo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,8 +18,14 @@ public class CustomerController {
     @Autowired
     CustomerService customerService;
 
+    /**
+     * To Save Customers
+     * @param customers
+     * @return
+     * @throws Exception
+     */
     @PostMapping(value = "/saveCustomer")
-    ResponseEntity<ResponsePojo> saveCustomer(@RequestBody Customers customers) {
+    ResponseEntity<ResponsePojo> saveCustomer(@RequestBody Customers customers) throws Exception{
         return new ResponseEntity<>(customerService.saveCustomer(customers), HttpStatus.OK);
     }
 }

@@ -1,29 +1,20 @@
 package com.retail.entity;
 
-import lombok.AllArgsConstructor;
+import lombok.Data;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document("customers")
+@Data
 public class Customers {
 
     @Id
     String id;
+    @NotNull
     String name;
+    @NotNull
+    String mobile;
 
-    public String getId() {
-        return id;
-    }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 }

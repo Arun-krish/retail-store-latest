@@ -2,7 +2,6 @@ package com.retail.util;
 
 import com.retail.exception.InputValidationException;
 import com.retail.exception.OperationFailureException;
-import com.retail.exception.OperationFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
