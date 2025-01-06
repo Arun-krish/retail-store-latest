@@ -3,15 +3,18 @@ package com.retail.entity;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document
+import java.util.Date;
+
+@Document("purchase_orders")
 public class PurchaseOrders {
 
     @Id
     String id;
     String customerId;
     String orderId;
-    Double orderTotal=0.0;
-    Double totalRewards=0.0;
+    Date orderDate;
+    Double orderTotal = 0.0;
+    Double totalRewards = 0.0;
 
     public String getId() {
         return id;
@@ -51,5 +54,13 @@ public class PurchaseOrders {
 
     public void setTotalRewards(Double totalRewards) {
         this.totalRewards = totalRewards;
+    }
+
+    public Date getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(Date orderDate) {
+        this.orderDate = orderDate;
     }
 }
