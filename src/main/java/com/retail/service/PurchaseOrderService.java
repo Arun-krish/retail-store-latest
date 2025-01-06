@@ -134,16 +134,16 @@ public class PurchaseOrderService {
         try{
             List<PurchaseOrders> purchaseOrdersList = purchaseOrderRepository.findByCustomerIdAndOrderDateGreaterThanEqual(customerId, fromDate);
             if(purchaseOrdersList.isEmpty()){
-                return new ResponsePojo( ApplicationConstants.SUCCESS, "No Order Details Found");
+                return new ResponsePojo( ApplicationConstants.SUCCESS, "No Order Details Found!");
             }else{
                 double totalOrderValue = purchaseOrdersList.stream().mapToDouble(PurchaseOrders::getOrderTotal).sum();
                 double totalRewardsValue = purchaseOrdersList.stream().mapToDouble(PurchaseOrders::getTotalRewards).sum();
-                Map<String, Object> responseMap = new HashMap<>();
+                Map<String, Object> responseMap = new LinkedHashMap<>();
                 responseMap.put(ApplicationConstants.TOTAL_ORDERS, purchaseOrdersList.size());
                 responseMap.put(ApplicationConstants.TOTAL_ORDERS_VALUE, totalOrderValue);
                 responseMap.put(ApplicationConstants.TOTAL_REWARD_POINTS, totalRewardsValue);
                 responseMap.put(ApplicationConstants.ORDERS, purchaseOrdersList);
-                return new ResponsePojo(ApplicationConstants.SUCCESS, "Details Fetched SUCCESSFULLY!", responseMap);
+                return new ResponsePojo(ApplicationConstants.SUCCESS, "Details Fetched Successfully!", responseMap);
             }
         }catch (Exception e){
             log.error("Failed to Fetch Purchase Orders ", e);

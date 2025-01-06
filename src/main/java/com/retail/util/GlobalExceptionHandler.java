@@ -13,7 +13,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({ InputValidationException.class, OperationFailureException.class })
     public ResponseEntity<ResponsePojo> handleInputValidationException(Exception  exception) {
 
-        ResponsePojo errorResponse = new ResponsePojo("FAILURE",exception.getLocalizedMessage());
+        ResponsePojo errorResponse = new ResponsePojo(ApplicationConstants.FAILURE,exception.getLocalizedMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

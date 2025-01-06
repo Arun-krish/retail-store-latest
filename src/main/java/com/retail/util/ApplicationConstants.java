@@ -3,6 +3,7 @@ package com.retail.util;
 public class ApplicationConstants {
 
     public static final String SUCCESS = "SUCCESS";
+    public static final String FAILURE = "FAILURE";
     public static final String STRING = "STRING";
     public static final String DATE = "DATE";
     public static final String NUMERIC = "NUMERIC";
