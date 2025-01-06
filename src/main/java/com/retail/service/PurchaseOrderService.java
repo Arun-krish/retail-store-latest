@@ -1,14 +1,22 @@
 package com.retail.service;
 
 import com.retail.entity.PurchaseOrders;
+import com.retail.exception.InputValidationException;
+import com.retail.exception.OperationFailureException;
+import com.retail.repository.CustomerRepository;
 import com.retail.repository.PurchaseOrderRepository;
 import com.retail.util.ResponsePojo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.InputStream;
@@ -19,64 +27,83 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+
 public class PurchaseOrderService {
 
     @Autowired
     PurchaseOrderRepository purchaseOrderRepository;
 
-    public ResponsePojo savePurchaseOrder(PurchaseOrders purchaseOrders) {
-        try {
+    @Autowired
+    CustomerRepository customerRepository;
+
+    public ResponsePojo savePurchaseOrder(PurchaseOrders purchaseOrders) throws Exception {
+        if (customerRepository.findById(purchaseOrders.getCustomerId()).isEmpty()) {
+            throw new InputValidationException("Customer Not Found with id -"+purchaseOrders.getCustomerId());
+        }
+        try{
             calculateRewardsBasedOnPurchaseOrder(purchaseOrders);
             purchaseOrderRepository.save(purchaseOrders);
-            return new ResponsePojo("SUCCESS","Puchase Order Saved!");
-        } catch (Exception e) {
-            return new ResponsePojo("FAILURE","Failed to Save Puchase Order");
-
+            return new ResponsePojo("SUCCESS", "Puchase Order Saved!");
+        }catch (Exception e){
+            throw new OperationFailureException(e.getLocalizedMessage());
         }
+
+
+
     }
 
-    public ResponsePojo bulkProcessPurchaseOrders() {
+    public ResponsePojo bulkProcessPurchaseOrders(MultipartFile file) throws Exception{
         try {
-
-            ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-            InputStream inputStream = classloader.getResourceAsStream("Retail_Purchase_Orders.xlsx");
-            XSSFWorkbook workbook=new XSSFWorkbook(inputStream);
-
-            XSSFSheet sheet=workbook.getSheetAt(0);
-            System.out.println(sheet.getPhysicalNumberOfRows());
-            for(int i=1;i<sheet.getPhysicalNumberOfRows();i++) {
-                PurchaseOrders purchaseOrders=new PurchaseOrders();
-                XSSFCell cell=sheet.getRow(i).getCell(0);
+            XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream());
+            XSSFSheet sheet = workbook.getSheetAt(0);
+            for (int i = 1; i < sheet.getPhysicalNumberOfRows(); i++) {
+                PurchaseOrders purchaseOrders = new PurchaseOrders();
+                XSSFRow row= sheet.getRow(i);
+                XSSFCell cell =row.getCell(0);
+                if(cell==null || cell.getStringCellValue()==null){
+                    throw new InputValidationException("Customer Id is Mandatory in Line no - "+i);
+                }
                 purchaseOrders.setCustomerId(cell.getStringCellValue());
-                cell=sheet.getRow(i).getCell(1);
+                if (customerRepository.findById(purchaseOrders.getCustomerId()).isEmpty()) {
+                    throw new InputValidationException("Customer Not Found with id -"+purchaseOrders.getCustomerId());
+                }
+                cell = row.getCell(1);
                 purchaseOrders.setOrderId(cell.getStringCellValue());
-                cell=sheet.getRow(i).getCell(2);
+                if(cell==null || cell.getStringCellValue()==null){
+                    throw new InputValidationException("Order Id is Mandatory in Line no - "+i);
+                }
+                cell = row.getCell(2);
                 purchaseOrders.setOrderDate(cell.getDateCellValue());
-                cell=sheet.getRow(i).getCell(3);
+                if(cell==null || cell.getDateCellValue()==null){
+                    throw new InputValidationException("Order Date is Mandatory in Line no - "+i);
+                }
+                cell = row.getCell(3);
                 purchaseOrders.setOrderTotal(cell.getNumericCellValue());
                 calculateRewardsBasedOnPurchaseOrder(purchaseOrders);
                 purchaseOrderRepository.save(purchaseOrders);
             }
 
-            return new ResponsePojo("SUCCESS","Puchase Order Saved!");
+            return new ResponsePojo("SUCCESS", "Puchase Order Saved!");
+        } catch (InputValidationException e) {
+            e.printStackTrace();
+            throw e;
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponsePojo("FAILURE","Failed to Save Puchase Order");
-
+            throw new OperationFailureException(e.getLocalizedMessage());
         }
     }
 
-    public ResponsePojo fetchOrderHistory(String customerId, Date fromDate){
+    public ResponsePojo fetchOrderHistory(String customerId, Date fromDate) {
 
-        List<PurchaseOrders> purchaseOrdersList=purchaseOrderRepository.findByCustomerIdAndOrderDateGreaterThanEqual(customerId, fromDate);
-        double totalOrderValue=purchaseOrdersList.stream().mapToDouble(PurchaseOrders::getOrderTotal).sum();
-        double totalRewardsValue=purchaseOrdersList.stream().mapToDouble(PurchaseOrders::getTotalRewards).sum();
-        Map<String,Object> responseMap=new HashMap<>();
-        responseMap.put("Total Orders",purchaseOrdersList.size());
-        responseMap.put("Total Order Value",totalOrderValue);
-        responseMap.put("Total Reward Points",totalRewardsValue);
-        responseMap.put("Orders",purchaseOrdersList);
-        ResponsePojo response= new ResponsePojo("SUCCESS","Puchase Order Saved!",responseMap);
+        List<PurchaseOrders> purchaseOrdersList = purchaseOrderRepository.findByCustomerIdAndOrderDateGreaterThanEqual(customerId, fromDate);
+        double totalOrderValue = purchaseOrdersList.stream().mapToDouble(PurchaseOrders::getOrderTotal).sum();
+        double totalRewardsValue = purchaseOrdersList.stream().mapToDouble(PurchaseOrders::getTotalRewards).sum();
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("Total Orders", purchaseOrdersList.size());
+        responseMap.put("Total Order Value", totalOrderValue);
+        responseMap.put("Total Reward Points", totalRewardsValue);
+        responseMap.put("Orders", purchaseOrdersList);
+        ResponsePojo response = new ResponsePojo("SUCCESS", "Puchase Order Saved!", responseMap);
         return response;
     }
 
@@ -86,7 +113,7 @@ public class PurchaseOrderService {
             purchaseOrders.setTotalRewards(rewardPoints + 50);
 
         } else if (purchaseOrders.getOrderTotal() >= 50 && purchaseOrders.getOrderTotal() <= 100) {
-            purchaseOrders.setTotalRewards(purchaseOrders.getOrderTotal()-50);
+            purchaseOrders.setTotalRewards(purchaseOrders.getOrderTotal() - 50);
 
         }
     }

@@ -2,6 +2,7 @@ package com.retail.controller;
 
 import com.retail.entity.Customers;
 import com.retail.entity.PurchaseOrders;
+import com.retail.exception.InputValidationException;
 import com.retail.service.CustomerService;
 import com.retail.service.PurchaseOrderService;
 import com.retail.util.ResponsePojo;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 
@@ -21,13 +23,13 @@ public class PurchaseOrderController {
     PurchaseOrderService purchaseOrderService;
 
     @PostMapping(value = "/savePurchaseOrder")
-    ResponseEntity<ResponsePojo> saveCustomer(@RequestBody PurchaseOrders purchaseOrders) {
+    ResponseEntity<ResponsePojo> saveCustomer(@RequestBody PurchaseOrders purchaseOrders) throws Exception {
         return new ResponseEntity<>(purchaseOrderService.savePurchaseOrder(purchaseOrders), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/bulkProcessPurchaseOrders")
-    ResponseEntity<ResponsePojo> bulkProcessPurchaseOrders() {
-        return new ResponseEntity<>(purchaseOrderService.bulkProcessPurchaseOrders(), HttpStatus.OK);
+    @PostMapping(value = "/bulkProcessPurchaseOrders")
+    ResponseEntity<ResponsePojo> bulkProcessPurchaseOrders(@RequestBody MultipartFile file)  throws Exception{
+        return new ResponseEntity<>(purchaseOrderService.bulkProcessPurchaseOrders(file), HttpStatus.OK);
     }
 
     @GetMapping(value = "/fetchOrderHistory")
