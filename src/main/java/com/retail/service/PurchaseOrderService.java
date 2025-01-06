@@ -6,6 +6,7 @@ import com.retail.exception.OperationFailureException;
 import com.retail.repository.CustomerRepository;
 import com.retail.repository.PurchaseOrderRepository;
 import com.retail.util.ApplicationConstants;
+import com.retail.util.DateUtils;
 import com.retail.util.ResponsePojo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.CellType;
@@ -127,12 +128,22 @@ public class PurchaseOrderService {
      * @return
      * @throws Exception
      */
-    public ResponsePojo fetchOrderHistory(String customerId, Date fromDate) throws Exception {
+    public ResponsePojo fetchOrderHistory(String customerId, Date fromDate,Date toDate,boolean lastThreeMonths) throws Exception {
         if (customerRepository.findById(customerId).isEmpty()) {
             throw new InputValidationException("Invalid Customer ID -" + customerId);
         }
+        List<PurchaseOrders> purchaseOrdersList;
+        if(fromDate != null && toDate !=null){
+            purchaseOrdersList = purchaseOrderRepository.findByCustomerIdAndOrderDateBetween(customerId, DateUtils.subractOneDayFromGivenDate(fromDate), DateUtils.addOneDayFromGivenDate(toDate));
+        }else if(fromDate != null){
+            purchaseOrdersList = purchaseOrderRepository.findByCustomerIdAndOrderDateGreaterThanEqual(customerId,fromDate);
+        }else if(lastThreeMonths){
+            purchaseOrdersList = purchaseOrderRepository.findByCustomerIdAndOrderDateGreaterThanEqual(customerId, DateUtils.fetchThreeMonthsBackDateFromCurrentDate());
+        }else{
+            throw new InputValidationException("Kindly Choose Time-Frame(From Date/To Date/Last 3 Months)" );
+        }
         try{
-            List<PurchaseOrders> purchaseOrdersList = purchaseOrderRepository.findByCustomerIdAndOrderDateGreaterThanEqual(customerId, fromDate);
+
             if(purchaseOrdersList.isEmpty()){
                 return new ResponsePojo( ApplicationConstants.SUCCESS, "No Order Details Found!");
             }else{
@@ -151,6 +162,10 @@ public class PurchaseOrderService {
         }
 
     }
+
+
+
+
 
     /**
      * To calculate Reward points based on Purchase order total

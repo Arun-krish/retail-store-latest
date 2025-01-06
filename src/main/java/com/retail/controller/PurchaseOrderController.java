@@ -49,7 +49,10 @@ public class PurchaseOrderController {
      * @throws Exception
      */
     @GetMapping(value = "/fetchOrderHistory")
-    ResponseEntity<ResponsePojo> fetchOrderHistory(@RequestHeader(required = true) String customerId,@RequestHeader(required = true) Date fromDate) throws Exception{
-        return new ResponseEntity<>(purchaseOrderService.fetchOrderHistory(customerId,fromDate), HttpStatus.OK);
+    ResponseEntity<ResponsePojo> fetchOrderHistory(@RequestHeader(required = true) String customerId,
+                                                   @RequestHeader(required = false) Date fromDate,
+                                                   @RequestHeader(required = false) Date toDate,
+                                                   @RequestHeader(required = false) boolean lastThreeMonths) throws Exception{
+        return new ResponseEntity<>(purchaseOrderService.fetchOrderHistory(customerId,fromDate,toDate,lastThreeMonths), HttpStatus.OK);
     }
 }
