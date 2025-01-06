@@ -43,6 +43,7 @@ public class PurchaseOrderService {
         }
         try {
             calculateRewardsBasedOnPurchaseOrder(purchaseOrders);
+            generateOrderNumber(purchaseOrders);
             purchaseOrderRepository.save(purchaseOrders);
             return new ResponsePojo(ApplicationConstants.SUCCESS, "Purchase Order Saved!",purchaseOrders);
         } catch (Exception e) {
@@ -77,23 +78,18 @@ public class PurchaseOrderService {
                     throw new InputValidationException("Invalid Customer ID -" + purchaseOrders.getCustomerId());
                 }
                 cell = row.getCell(1);
-                if (isEmptyCell(cell,  ApplicationConstants.STRING)) {
-                    throw new InputValidationException("Order Id is Mandatory in Row no - " + i);
-                }
-                purchaseOrders.setOrderId(cell.getStringCellValue());
-
-                cell = row.getCell(2);
                 if (isEmptyCell(cell,  ApplicationConstants.DATE)) {
                     throw new InputValidationException("Order Date is Mandatory in Row no - " + i);
                 }
                 purchaseOrders.setOrderDate(cell.getDateCellValue());
 
-                cell = row.getCell(3);
+                cell = row.getCell(2);
                 if (isEmptyCell(cell,  ApplicationConstants.NUMERIC)) {
                     throw new InputValidationException("Order Total is Mandatory in Row no - " + i);
                 }
                 purchaseOrders.setOrderTotal(cell.getNumericCellValue());
                 calculateRewardsBasedOnPurchaseOrder(purchaseOrders);
+                generateOrderNumber(purchaseOrders);
                 purchaseOrderRepository.save(purchaseOrders);
                 purchaseOrdersList.add(purchaseOrders);
             }
@@ -106,6 +102,15 @@ public class PurchaseOrderService {
             log.error("Failed to Upload Purchase Orders ", e);
             throw new OperationFailureException(e.getLocalizedMessage());
         }
+    }
+
+    /**
+     * To generate Purchase Order number
+     * @param purchaseOrders
+     */
+    void generateOrderNumber(PurchaseOrders purchaseOrders){
+        int puchaseOrdersListSize=purchaseOrderRepository.findAll().size();
+        purchaseOrders.setOrderId("O"+(puchaseOrdersListSize+1));
     }
 
     /**
