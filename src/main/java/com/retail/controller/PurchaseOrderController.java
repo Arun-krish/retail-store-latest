@@ -34,7 +34,7 @@ public class PurchaseOrderController {
      * @return
      * @throws Exception
      */
-    @PostMapping(value = "/bulkProcessPurchaseOrders")
+    @GetMapping(value = "/bulkProcessPurchaseOrders")
     ResponseEntity<ResponsePojo> bulkProcessPurchaseOrders()  throws Exception{
         return new ResponseEntity<>(purchaseOrderService.bulkProcessPurchaseOrders(), HttpStatus.OK);
     }
