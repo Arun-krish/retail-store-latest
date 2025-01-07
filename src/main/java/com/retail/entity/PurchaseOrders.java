@@ -1,8 +1,10 @@
 package com.retail.entity;
 
+import com.retail.util.ApplicationConstants;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -29,5 +31,7 @@ public class PurchaseOrders {
     LocalDate orderDate;
     Double orderTotal = 0.0;
     Double totalRewards = 0.0;
-
+    @CreatedDate
+    LocalDate createdOn;
+    String createdBy= ApplicationConstants.ADMIN_USER;
 }

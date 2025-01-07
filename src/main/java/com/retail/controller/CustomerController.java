@@ -25,7 +25,7 @@ public class CustomerController {
      * @throws Exception
      */
     @PostMapping(value = "/saveCustomer")
-    ResponseEntity<ResponsePojo> saveCustomer(@RequestBody Customers customers) throws Exception{
+    public ResponseEntity<ResponsePojo> saveCustomer(@RequestBody Customers customers) throws Exception{
         return new ResponseEntity<>(customerService.saveCustomer(customers), HttpStatus.OK);
     }
 }

@@ -10,4 +10,5 @@ public class ApplicationConstants {
     public static final String TOTAL_ORDERS_VALUE = "Total Order Value";
     public static final String TOTAL_REWARD_POINTS = "Total Reward Points";
     public static final String ORDERS = "Orders";
+    public static final String ADMIN_USER = "ADMIN_USER";
 }
