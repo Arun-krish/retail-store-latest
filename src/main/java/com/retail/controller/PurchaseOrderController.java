@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 
@@ -31,14 +30,13 @@ public class PurchaseOrderController {
     }
 
     /**
-     * To capture Purchase order file and process rewards based on orders
-     * @param file
+     * To process rewards based on bulk Purchase Orders
      * @return
      * @throws Exception
      */
     @PostMapping(value = "/bulkProcessPurchaseOrders")
-    ResponseEntity<ResponsePojo> bulkProcessPurchaseOrders(@RequestBody MultipartFile file)  throws Exception{
-        return new ResponseEntity<>(purchaseOrderService.bulkProcessPurchaseOrders(file), HttpStatus.OK);
+    ResponseEntity<ResponsePojo> bulkProcessPurchaseOrders()  throws Exception{
+        return new ResponseEntity<>(purchaseOrderService.bulkProcessPurchaseOrders(), HttpStatus.OK);
     }
 
     /**

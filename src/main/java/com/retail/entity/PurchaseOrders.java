@@ -6,13 +6,13 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Document("purchase_orders")
 @Data
 @NoArgsConstructor
 public class PurchaseOrders {
-    public PurchaseOrders(String customerId, String orderId, Date orderDate, Double orderTotal) {
+    public PurchaseOrders(String customerId, String orderId, LocalDate orderDate, Double orderTotal) {
         this.customerId = customerId;
         this.orderId = orderId;
         this.orderDate = orderDate;
@@ -26,7 +26,7 @@ public class PurchaseOrders {
     @NotNull
     String orderId;
     @NotNull
-    Date orderDate;
+    LocalDate orderDate;
     Double orderTotal = 0.0;
     Double totalRewards = 0.0;
 

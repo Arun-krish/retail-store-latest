@@ -8,8 +8,8 @@ import java.util.List;
 
 public interface PurchaseOrderRepository extends MongoRepository<PurchaseOrders, String> {
 
-
     List<PurchaseOrders> findByCustomerIdAndOrderDateBetween(String customerId, Date fromDate,Date toDate);
+
 
     List<PurchaseOrders> findByCustomerIdAndOrderDateGreaterThanEqual(String customerId, Date fromDate);
 }
